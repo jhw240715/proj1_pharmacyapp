@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}주변 약국 - 약국 리뷰 사이트{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">주변 약국 목록</h1>
+
+{% if pharmacies %}
+    <div class="row">
+    {% for pharmacy in pharmacies %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ pharmacy.pname }}</h5>
+                    <p class="card-text">
+                        <strong>주소:</strong> {{ pharmacy.paddr }}<br>
+                        <strong>거리:</strong> 약 {{ pharmacy.distance|floatformat:1 }} km
+                    </p>
+                    <a href="{% url 'pharmacy_detail' pharmacy.p_id %}" class="btn btn-primary">상세 정보</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+    <p>주변 5km 이내에 약국이 없습니다.</p>
+{% endif %}
+
+{% endblock %}

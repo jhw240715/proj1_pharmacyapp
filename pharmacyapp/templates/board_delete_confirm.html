@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>리뷰 삭제 확인</h2>
+<p>정말로 이 리뷰와 관련된 평점을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</p>
+<p>리뷰 제목: {{ board.title }}</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">삭제</button>
+    <a href="{% url 'board_detail' board.id %}" class="btn btn-secondary">취소</a>
+</form>
+{% endblock %}

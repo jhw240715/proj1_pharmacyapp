@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}홈 - 약국 리뷰 사이트{% endblock %}
+
+{% block content %}
+<div class="home-header text-center">
+    <h1 class="display-4">약국 리뷰에 오신 것을 환영합니다!</h1>
+    <p class="lead">주변 약국을 찾고 리뷰를 확인하세요. 다른 사용자들의 경험을 공유하고 의견을 나누세요.</p>
+    <hr class="my-4">
+    <p>지금 바로 시작하세요!</p>
+    <div class="mt-4">
+        <a href="{% url 'pharmacy_list' %}" class="btn btn-primary btn-lg me-3">
+            <span class="btn-icon">🏥</span>
+            <span class="btn-text">약국 찾기</span>
+        </a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'board_list' %}" class="btn btn-primary btn-lg me-3">
+                <span class="btn-icon">⭐</span>
+                <span class="btn-text">리뷰 보기</span>
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-secondary btn-lg">
+                <span class="btn-icon">🔒</span>
+                <span class="btn-text">로그인하여 리뷰 작성</span>
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="content-wrapper mt-5">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 class="card-title">약국 찾기</h2>
+                    <p class="card-text">주변의 약국을 쉽게 찾아보세요. 위치, 운영 시간 등 상세 정보를 확인할 수 있습니다.</p>
+                    <a href="{% url 'pharmacy_list' %}" class="btn btn-primary">약국 찾기</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 class="card-title">리뷰 읽기</h2>
+                    <p class="card-text">다른 사용자들의 경험과 의견을 읽어보세요. 약국 서비스의 질과 만족도를 미리 확인할 수 있습니다.</p>
+                    <a href="{% url 'board_list' %}" class="btn btn-primary">리뷰 읽기</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 class="card-title">리뷰 작성</h2>
+                    <p class="card-text"> 로그인하여 방문한 약국에 대한 여러분의 경험을 공유해주세요. 다른 사용자들에게 도움이 될 수 있습니다.</p>
+                    <a href="{% url 'login' %}" class="btn btn-primary">리뷰 작성</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

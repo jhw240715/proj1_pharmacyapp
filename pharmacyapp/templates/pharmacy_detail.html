@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ pharmacy.pname }} - 약국 상세 정보{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">{{ pharmacy.pname }}</h1>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">약국 정보</h5>
+        <p class="card-text">
+            <strong>주소:</strong> {{ pharmacy.paddr }}<br>
+            {% if pharmacy.latitude and pharmacy.longitude %}
+                <strong>위치:</strong> {{ pharmacy.latitude }}, {{ pharmacy.longitude }}<br>
+            {% endif %}
+            <!-- Add more pharmacy details here if available -->
+        </p>
+    </div>
+</div>
+
+<h2 class="mb-3">리뷰 및 평점</h2>
+
+{% if user.is_authenticated %}
+    <a href="{% url 'create_board_and_score' pharmacy.p_id %}" class="btn btn-primary mb-3">리뷰 및 평점 작성</a>
+{% endif %}
+
+{% if boards %}
+    {% for board in boards %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ board.title }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">작성자: {{ board.user.username }} | 작성일: {{ board.uptime|date:"Y-m-d H:i" }}</h6>
+                <p class="card-text">{{ board.content }}</p>
+                
+                {% if scores %}
+                    {% for score in scores %}
+                        {% if score.p == pharmacy and score.user == board.user %}
+                            <div class="mt-2">
+                                <strong>평점:</strong>
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= score.q1_score %}
+                                        <span class="text-warning">&#9733;</span>
+                                    {% else %}
+                                        <span class="text-muted">&#9734;</span>
+                                    {% endif %}
+                                {% endfor %}
+                                ({{ score.q1_score }}/5)
+                            </div>
+                            <!-- You can display other scores (q2_score, q3_score, etc.) similarly if needed -->
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                
+                {% if user == board.user %}
+                    <a href="{% url 'board_update' board.id %}" class="btn btn-sm btn-outline-secondary mt-2">수정</a>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>아직 리뷰가 없습니다.</p>
+{% endif %}
+
+{% endblock %}

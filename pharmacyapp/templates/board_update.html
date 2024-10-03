@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}리뷰 수정 - {{ board.title }}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">리뷰 수정</h1>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">리뷰 내용</h3>
+            
+            <div class="mb-3">
+                <label for="{{ form.title.id_for_label }}" class="form-label">제목</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="alert alert-danger">
+                        {{ form.title.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.content.id_for_label }}" class="form-label">내용</label>
+                {{ form.content }}
+                {% if form.content.errors %}
+                    <div class="alert alert-danger">
+                        {{ form.content.errors }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if score_form %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">평점 수정</h3>
+            
+            {% for field in score_form %}
+                <div class="mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+                    <div>
+                        {% for radio in field %}
+                            <div class="form-check form-check-inline">
+                                {{ radio.tag }}
+                                <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                    {{ radio.choice_label }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if field.errors %}
+                        <div class="alert alert-danger">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">수정 완료</button>
+    <a href="{% url 'board_detail' board.pk %}" class="btn btn-secondary">취소</a>
+</form>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    textarea {
+        width: 100%;
+        min-height: 150px;
+    }
+</style>
+{% endblock %}

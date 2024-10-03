@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ board.title }} - 리뷰 상세{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-body">
+        <h1 class="card-title">{{ board.title }}</h1>
+        <h6 class="card-subtitle mb-2 text-muted">
+            작성자: {{ board.user.username }} | 
+            작성일: {{ board.uptime|date:"Y-m-d H:i" }} | 
+            약국: <a href="{% url 'pharmacy_detail' board.pname.p_id %}">{{ board.pname.pname }}</a>
+        </h6>
+        <p class="card-text">{{ board.content|linebreaks }}</p>
+
+        {% if score %}
+            <div class="mt-4">
+                <h5>평점</h5>
+                <ul class="list-unstyled">
+                    <li>질문 1: {{ score.q1_score }}/5</li>
+                    <li>질문 2: {{ score.q2_score }}/5</li>
+                    <li>질문 3: {{ score.q3_score }}/5</li>
+                    <li>질문 4: {{ score.q4_score }}/5</li>
+                    <li>질문 5: {{ score.q5_score }}/5</li>
+                </ul>
+                <p>평균 평점: {{ score.average_score|floatformat:1 }}/5</p>
+            </div>
+        {% else %}
+            <p class="mt-4">이 리뷰에 대한 평점이 없습니다.</p>
+        {% endif %}
+
+        {% if user == board.user %}
+            <div class="mt-4">
+                <a href="{% url 'board_update' board.pk %}" class="btn btn-primary">수정</a>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    삭제
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<a href="{% url 'board_list' %}" class="btn btn-secondary">목록으로 돌아가기</a>
+
+{% if user == board.user %}
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">리뷰 삭제 확인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    정말로 이 리뷰를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <form action="{% url 'board_delete' board.pk %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">삭제</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
