@@ -141,3 +141,6 @@ AUTHENTICATION_BACKENDS = (
     'myproject.backend.EmailAuthBackend',  # 이메일로 로그인하는 커스텀 백엔드
     'django.contrib.auth.backends.ModelBackend',  # 기본 Django 백엔드
 )
+
+
+GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')

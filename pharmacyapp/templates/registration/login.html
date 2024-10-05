@@ -1,12 +1,38 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}로그인{% endblock %}
+{% block title %}로그인 - 약국 리뷰 사이트{% endblock %}
 
 {% block content %}
-<h2>로그인</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">로그인</button>
-</form>
+<div class="content-wrapper mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">로그인</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">사용자 이름</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">비밀번호</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <span class="btn-icon">🔐</span>
+                                <span class="btn-text">로그인</span>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p>계정이 없으신가요? <a href="{% url 'signup' %}">회원가입</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

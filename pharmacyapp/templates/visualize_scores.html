@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}점수 시각화{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">점수 시각화</h1>
+    <div class="text-center">
+        <img src="{% url 'visualize_scores' %}" alt="점수 시각화" class="img-fluid" />
+    </div>
+    <div class="mt-4">
+        <h2>설명</h2>
+        <p>이 그래프는 다음 정보를 보여줍니다:</p>
+        <ul>
+            <li>각 질문의 평균 점수</li>
+            <li>약국(p_id)별 질문 총합의 평균</li>
+            <li>게시글 총 개수</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

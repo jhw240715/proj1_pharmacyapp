@@ -1,10 +1,43 @@
 {% extends 'base.html' %}
 
-{% block title %}대시보드 - 약국 리뷰 사이트{% endblock %}
+{% block title %}대시보드{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="my-4">대시보드</h1>
-    <p>안녕하세요, {{ user.username }}님!</p>
+<h1>약국 정보 대시보드</h1>
+
+<div class="dashboard-container">
+    <div class="dashboard-item">
+        <h2>사용자별 게시글 수</h2>
+        <ul>
+            {% for user in user_post_counts %}
+                <li>사용자 ID {{ user.user_id }}: {{ user.post_count }}개</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="dashboard-item">
+        <h2>질문별 평균 점수</h2>
+        <ul>
+            <li>질문 1: {{ avg_scores.q1_avg|floatformat:2 }}</li>
+            <li>질문 2: {{ avg_scores.q2_avg|floatformat:2 }}</li>
+            <li>질문 3: {{ avg_scores.q3_avg|floatformat:2 }}</li>
+            <li>질문 4: {{ avg_scores.q4_avg|floatformat:2 }}</li>
+            <li>질문 5: {{ avg_scores.q5_avg|floatformat:2 }}</li>
+        </ul>
+    </div>
+
+    <div class="dashboard-item">
+        <h2>약국별 평점 총점</h2>
+        <ul>
+            {% for pharmacy in pharmacy_total_scores %}
+                <li>약국 ID {{ pharmacy.p_id }}: {{ pharmacy.total_score|floatformat:2 }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="dashboard-item">
+        <h2>전체 평점 평균</h2>
+        <p>{{ total_avg|floatformat:2 }}</p>
+    </div>
 </div>
 {% endblock %}

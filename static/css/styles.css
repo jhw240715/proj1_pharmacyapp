@@ -4,19 +4,6 @@ body {
     padding: 20px;
 }
 
-.content-container {
-    background-color: #ffffff;
-    border-radius: 15px;
-    padding: 20px;
-    margin: 0 auto;
-    max-width: 1200px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-h1, h2, h3, h4, h5, h6, .navbar-brand {
-    font-family: 'Jua', sans-serif;
-}
-
 .navbar {
     background-color: #4a90e2 !important;
     border-bottom: 3px solid #3a7bc8;
@@ -28,30 +15,38 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
     text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
 }
 
-.home-header {
+.login-container {
     background-color: #ffffff;
-    border: 3px solid #4a90e2;
     border-radius: 15px;
+    padding: 30px;
+    margin: 50px auto;
+    max-width: 400px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    padding: 60px 0;
-    margin-bottom: 30px;
+    border: 3px solid #4a90e2;
 }
 
-.home-header h1 {
-    font-size: 3.5rem;
-    font-weight: bold;
-    margin-bottom: 20px;
+.login-title {
+    font-family: 'Jua', sans-serif;
     color: #4a90e2;
-    text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    font-weight: bold;
 }
 
-.home-header p {
-    font-size: 1.3rem;
-    margin-bottom: 30px;
+.form-label {
+    font-weight: bold;
     color: #333;
 }
 
-.btn-primary {
+.form-control {
+    border: 2px solid #4a90e2;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.btn-login {
     background-color: #4a90e2;
     border-color: #4a90e2;
     color: #fff;
@@ -61,58 +56,30 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
     transition: all 0.3s ease;
     position: relative;
     top: 0;
+    width: 100%;
+    padding: 10px;
+    font-size: 1.1rem;
 }
 
-.btn-primary:hover {
+.btn-login:hover {
     background-color: #3a7bc8;
     border-color: #3a7bc8;
     top: 2px;
     box-shadow: 0 2px 0 #2a6cb8;
 }
 
-.btn-icon {
-    display: inline-block;
-    margin-right: 8px;
-    transition: transform 0.3s ease;
+.signup-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
 }
 
-.btn-primary:hover .btn-icon {
-    transform: scale(1.1);
-}
-
-.btn-lg {
-    font-size: 1.25rem;
-    padding: 0.75rem 1.5rem;
-}
-
-.card {
-    border: 2px solid #4a90e2;
-    border-radius: 10px;
-    background-color: #ffffff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0,0,0,.1);
-}
-
-.card-title {
+.signup-link a {
     color: #4a90e2;
+    text-decoration: none;
     font-weight: bold;
-    font-size: 1.4rem;
 }
 
-.card-text {
-    color: #333;
-    font-size: 1.1rem;
-}
-
-.content-wrapper {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 15px;
-    margin-top: 30px;
-    border: 3px solid #4a90e2;
+.signup-link a:hover {
+    text-decoration: underline;
 }

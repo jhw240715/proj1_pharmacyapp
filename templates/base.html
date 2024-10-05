@@ -29,6 +29,8 @@
                         <li class="nav-item"><a class="nav-link" href="{% url 'pharmacy_list' %}">약국 목록</a></li>
                         {% if user.is_authenticated %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'board_list' %}">리뷰 목록</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">대시보드</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'visualize_scores' %}">데이터 보기</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">로그아웃</a></li>
                         {% else %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">로그인</a></li>
