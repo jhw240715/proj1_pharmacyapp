@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block title %}데이터 시각화{% endblock %}
+
+{% block content %}
+<h2>데이터 시각화</h2>
+<img src="{% url 'visualize_scores' %}" alt="데이터 시각화">
+{% endblock %}
