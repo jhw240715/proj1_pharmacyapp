@@ -1,49 +1,59 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Pharmacy(models.Model):
-    name = models.CharField(max_length=100, null=False)
-    address = models.CharField(max_length=100, null=False)
-    latitude = models.FloatField(null=True, blank=True)
-    longitude = models.FloatField(null=True, blank=True)
+class User(models.Model):
+    user_id = models.AutoField(primary_key=True)
+    pword = models.CharField(max_length=20, blank=True, null=True)
+    email = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
+        managed = False
+        db_table = 'user'
+
+
+class Pharmacy(models.Model):
+    pname = models.CharField(max_length=100, blank=True, null=True)
+    p_id = models.AutoField(primary_key=True)
+    paddr = models.CharField(max_length=100, blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
         db_table = 'pharmacy'
 
     def __str__(self):
-        return self.name
+        return self.pname
+
 
 class Board(models.Model):
-    pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name='boards')
+    board_id = models.AutoField(primary_key=True)
+    pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name='boards', to_field='p_id')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200, null=False)
-    content = models.TextField(null=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    title = models.CharField(max_length=20, blank=True, null=True)
+    content = models.CharField(max_length=100, blank=True, null=True)
+    uptime = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'board'
-        unique_together = (('pharmacy', 'user'),)
 
     def __str__(self):
-        return self.title
-
-class Score(models.Model):
-    pharmacy = models.ForeignKey(Pharmacy, on_delete=models.CASCADE, related_name='scores')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    q1_score = models.IntegerField(null=False)
-    q2_score = models.IntegerField(null=False)
-    q3_score = models.IntegerField(null=False)
-    q4_score = models.IntegerField(null=False)
-    q5_score = models.IntegerField(null=False)
-
-    class Meta:
-        db_table = 'score'
-        unique_together = (('pharmacy', 'user'),)
-
-    def __str__(self):
-        return f"Score for {self.pharmacy.name} by {self.user.username}"
+        return f"{self.board_id}: {self.title}"
 
     @property
-    def average_score(self):
-        return (self.q1_score + self.q2_score + self.q3_score + self.q4_score + self.q5_score) / 5
+    def pname(self):
+        return self.pharmacy.pname if self.pharmacy else None
+
+
+
+class Score(models.Model):
+    p = models.ForeignKey(Pharmacy, on_delete=models.CASCADE)
+    q1_score = models.IntegerField(blank=True, null=True)
+    q2_score = models.IntegerField(blank=True, null=True)
+    q3_score = models.IntegerField(blank=True, null=True)
+    q4_score = models.IntegerField(blank=True, null=True)
+    q5_score = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'score'
