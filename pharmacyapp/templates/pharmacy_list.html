@@ -3,31 +3,33 @@
 {% block title %}약국 목록 - 약국 리뷰 사이트{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">약국 목록</h1>
+<div class="container mt-4">
+    <h1 class="mb-4">약국 목록</h1>
 
-<p>총 약국 수: {{ pharmacies.count }}</p>
+    <p>총 약국 수: {{ pharmacies.count }}</p>
 
-{% if pharmacies %}
-    <div class="row">
-    {% for pharmacy in pharmacies %}
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{{ pharmacy.pname }}</h5>
-                    <p class="card-text">
-                        <strong>ID:</strong> {{ pharmacy.p_id }}<br>
-                        <strong>주소:</strong> {{ pharmacy.paddr }}<br>
-                        <strong>위도:</strong> {{ pharmacy.latitude }}<br>
-                        <strong>경도:</strong> {{ pharmacy.longitude }}
-                    </p>
+    {% if pharmacies %}
+        <div class="row">
+        {% for pharmacy in pharmacies %}
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ pharmacy.name }}</h5>
+                        <p class="card-text">
+                            <strong>ID:</strong> {{ pharmacy.p_id }}<br>
+                            <strong>주소:</strong> {{ pharmacy.address }}<br>
+                            <strong>전화:</strong> {{ pharmacy.phone|default:"정보 없음" }}<br>
+                            <strong>위도:</strong> {{ pharmacy.latitude }}<br>
+                            <strong>경도:</strong> {{ pharmacy.longitude }}
+                        </p>
+                        <a href="{% url 'pharmacy_detail' p_id=pharmacy.p_id %}" class="btn btn-primary">상세 정보</a>
+                    </div>
                 </div>
             </div>
+        {% endfor %}
         </div>
-    {% empty %}
-        <p>약국 정보가 없습니다.</p>
-    {% endfor %}
-    </div>
-{% else %}
-    <p>등록된 약국이 없습니다.</p>
-{% endif %}
+    {% else %}
+        <p class="alert alert-warning">등록된 약국이 없습니다.</p>
+    {% endif %}
+</div>
 {% endblock %}

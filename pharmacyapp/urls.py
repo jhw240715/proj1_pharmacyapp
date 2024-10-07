@@ -16,8 +16,8 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
 
     # 약국
-    # path('pharmacy-list/', views.pharmacy_list, name='pharmacy_list'),
-    # path('pharmacy/<int:p_id>/', views.pharmacy_detail, name='pharmacy_detail'),
+    path('pharmacy-list/', views.pharmacy_list, name='pharmacy_list'),
+    path('pharmacy/<int:p_id>/', views.pharmacy_detail, name='pharmacy_detail'),
     # path('nearby/', views.nearby_pharmacies, name='nearby_pharmacies'),
 
     # 약국 보드(리뷰) & 스코어
