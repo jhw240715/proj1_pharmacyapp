@@ -1,24 +1,27 @@
 from django.shortcuts import render, redirect, get_object_or_404
-import requests
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.views import LoginView
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.core.paginator import Paginator
+from django.db import transaction
+from django.db.models import Count, Avg
+from django.conf import settings
+from django.http import HttpResponse
+
+import requests
+from geopy.distance import geodesic
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+from io import BytesIO
+import matplotlib.font_manager as fm
+
 from .models import Pharmacy, Score, Board
 from .forms import BoardForm, ScoreForm, CustomUserCreationForm
-from django.db import transaction
-from django.contrib.auth import logout
-from django.contrib.auth.views import LoginView
-from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from django.db.models import Count, Avg
-from .models import Board, Score
-
 # ----------------------
 # 약국 관련
 # ----------------------
@@ -42,12 +45,6 @@ def pharmacy_detail(request, p_id):
 
 
 # 유저 0.5km 반경 약국 찾기
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from django.conf import settings
-from .models import Pharmacy
-from geopy.distance import geodesic
-import requests
 
 GOOGLE_MAPS_API_KEY = settings.GOOGLE_MAPS_API_KEY
 
@@ -266,16 +263,6 @@ def dashboard(request):
 
     return render(request, 'dashboard.html', context)
 
-
-
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
-from io import BytesIO
-from django.http import HttpResponse
-from .models import Score
-import matplotlib.font_manager as fm
 
 def visualize_scores(request):
     # 한글 폰트 설정

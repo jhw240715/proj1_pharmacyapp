@@ -12,6 +12,13 @@ class ScoreForm(forms.ModelForm):
     class Meta:
         model = Score
         fields = ['q1_score', 'q2_score', 'q3_score', 'q4_score', 'q5_score']
+        labels = {
+            'q1_score': '1. 의약품 가격 책정은 잘되었나요?',
+            'q2_score': '2. 의약품, 영양제 구비가 잘 되어 있나요?',
+            'q3_score': '3. 약사의 설명과 행동이 친절한가요?',
+            'q4_score': '4. 시설이 깨끗한가요?',
+            'q5_score': '5. 접근성이 좋았나요? (교통 편의성, 거주지와의 거리 등)',
+        }
         widgets = {
             'q1_score': forms.RadioSelect(choices=[(i, str(i)) for i in range(1, 6)]),
             'q2_score': forms.RadioSelect(choices=[(i, str(i)) for i in range(1, 6)]),
