@@ -1,7 +1,8 @@
 from django.urls import path
 from . import views
 from .views import CustomLoginView, BoardUpdateView
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -29,4 +30,5 @@ urlpatterns = [
     path('visualize_scores_page/', views.visualize_scores_page, name='visualize_scores_page'),
     ]
 
-
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
