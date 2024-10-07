@@ -12,12 +12,14 @@
         </div>
         <div class="col-md-4">
             <h2>검색된 약국 목록</h2>
-            <ul id="pharmacy-list" class="list-group"></ul>
+            <div id="pharmacy-list-container" style="height: 400px; overflow-y: auto;">
+                <ul id="pharmacy-list" class="list-group"></ul>
+            </div>
         </div>
     </div>
 </div>
 
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_maps_api_key }}&libraries=services"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_MAPS_API_KEY }}&libraries=services"></script>
 <script>
     var mapContainer = document.getElementById('map'),
         mapOption = {

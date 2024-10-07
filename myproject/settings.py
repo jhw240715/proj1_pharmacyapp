@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'pharmacyapp',  # 앱추가
+    'location_field.apps.DefaultConfig',
 ]
 
 MIDDLEWARE = [
@@ -143,4 +144,5 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
+# GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
+KAKAO_MAPS_API_KEY = os.getenv('KAKAO_MAPS_API_KEY')

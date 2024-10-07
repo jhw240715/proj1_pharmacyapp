@@ -4,6 +4,7 @@ from .views import CustomLoginView, BoardUpdateView
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
     path('', views.home, name='home'),
 
@@ -15,9 +16,9 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
 
     # 약국
-    path('pharmacy-list/', views.pharmacy_list, name='pharmacy_list'),
-    path('pharmacy/<int:p_id>/', views.pharmacy_detail, name='pharmacy_detail'),
-    path('nearby/', views.nearby_pharmacies, name='nearby_pharmacies'),
+    # path('pharmacy-list/', views.pharmacy_list, name='pharmacy_list'),
+    # path('pharmacy/<int:p_id>/', views.pharmacy_detail, name='pharmacy_detail'),
+    # path('nearby/', views.nearby_pharmacies, name='nearby_pharmacies'),
 
     # 약국 보드(리뷰) & 스코어
     path('board-list/', views.board_list_view, name='board_list'),
@@ -28,6 +29,10 @@ urlpatterns = [
 
     path('visualize_scores/', views.visualize_scores, name='visualize_scores'),
     path('visualize_scores_page/', views.visualize_scores_page, name='visualize_scores_page'),
+
+    path('pharmacy/search/', views.pharmacy_search, name='pharmacy_search'),
+    path('pharmacy/save/', views.save_pharmacies, name='save_pharmacies'),
+
     ]
 
 if settings.DEBUG:

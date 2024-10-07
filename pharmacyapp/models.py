@@ -12,19 +12,19 @@ class User(models.Model):
 
 
 class Pharmacy(models.Model):
-    pname = models.CharField(max_length=100, blank=True, null=True)
-    p_id = models.AutoField(primary_key=True)
-    paddr = models.CharField(max_length=100, blank=True, null=True)
-    latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
+    p_id = models.CharField(max_length=100, unique=True)  # 카카오 API의 고유 ID
+    name = models.CharField(max_length=200)
+    address = models.CharField(max_length=500)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
 
     class Meta:
         managed = False
         db_table = 'pharmacy'
 
     def __str__(self):
-        return self.pname
-
+        return self.name
 
 class Board(models.Model):
     board_id = models.AutoField(primary_key=True)
