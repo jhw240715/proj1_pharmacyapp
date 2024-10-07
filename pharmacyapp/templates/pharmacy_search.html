@@ -6,6 +6,16 @@
 {% block content %}
 <div class="container">
     <h1>약국 검색</h1>
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <div class="input-group">
+                <input type="text" id="address" class="form-control" placeholder="주소를 입력하세요">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" onclick="searchAddress()">검색</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-8">
             <div id="map" style="width:100%;height:400px;"></div>
@@ -30,6 +40,7 @@
     var map = new kakao.maps.Map(mapContainer, mapOption);
     var infowindow = new kakao.maps.InfoWindow({zIndex:1});
     var ps = new kakao.maps.services.Places(map);
+    var geocoder = new kakao.maps.services.Geocoder();
     var pharmacyListElement = document.getElementById('pharmacy-list');
 
     // 현재 위치 가져오기
@@ -53,43 +64,64 @@
         searchPharmacies(locPosition);
     }
 
+    function searchAddress() {
+        var keyword = document.getElementById('address').value;
+
+        // 키워드로 장소 검색
+        ps.keywordSearch(keyword, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                // 검색된 장소 중 첫 번째 결과의 좌표 사용
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                map.setCenter(coords);
+
+                // 해당 좌표 주변의 약국 검색
+                searchPharmacies(coords);
+            } else {
+                alert('해당 키워드의 장소를 찾을 수 없습니다. 다시 확인해주세요.');
+            }
+        });
+    }
+
     function searchPharmacies(location) {
-        ps.keywordSearch('약국', placesSearchCB, {
+        ps.keywordSearch('약국', function(data, status, pagination) {
+            if (status === kakao.maps.services.Status.OK) {
+                pharmacyListElement.innerHTML = ''; // 목록 초기화
+                var bounds = new kakao.maps.LatLngBounds();
+
+                for (var i = 0; i < data.length; i++) {
+                    displayMarker(data[i]);
+                    bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
+                }
+
+                map.setBounds(bounds);
+
+                var pharmacies = data.map(place => ({
+                    id: place.id,
+                    name: place.place_name,
+                    address: place.address_name,
+                    phone: place.phone,
+                    latitude: place.y,
+                    longitude: place.x
+                }));
+
+                pharmacies.forEach(addToPharmacyList);
+                savePharmacies(pharmacies);
+            }
+        }, {
             location: location,
             radius: 5000,
             sort: kakao.maps.services.SortBy.DISTANCE
         });
     }
 
-    function placesSearchCB(data, status, pagination) {
-        if (status === kakao.maps.services.Status.OK) {
-            pharmacyListElement.innerHTML = ''; // 목록 초기화
-            var pharmacies = data.map(place => ({
-                id: place.id,
-                name: place.place_name,
-                address: place.address_name,
-                phone: place.phone,
-                latitude: place.y,
-                longitude: place.x
-            }));
-
-            pharmacies.forEach(function(pharmacy) {
-                displayMarker(pharmacy);
-                addToPharmacyList(pharmacy);
-            });
-
-            savePharmacies(pharmacies);
-        }
-    }
-
     function displayMarker(place) {
         var marker = new kakao.maps.Marker({
             map: map,
-            position: new kakao.maps.LatLng(place.latitude, place.longitude)
+            position: new kakao.maps.LatLng(place.y, place.x)
         });
 
         kakao.maps.event.addListener(marker, 'click', function() {
-            infowindow.setContent('<div style="padding:5px;font-size:12px;">' + place.name + '</div>');
+            infowindow.setContent('<div style="padding:5px;font-size:12px;">' + place.place_name + '</div>');
             infowindow.open(map, marker);
         });
     }

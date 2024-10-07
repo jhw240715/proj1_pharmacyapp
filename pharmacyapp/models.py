@@ -12,7 +12,7 @@ class User(models.Model):
 
 
 class Pharmacy(models.Model):
-    p_id = models.CharField(max_length=100, unique=True)  # 카카오 API의 고유 ID
+    p_id = models.CharField(max_length=100, primary_key=True)  # 카카오 API의 고유 ID
     name = models.CharField(max_length=200)
     address = models.CharField(max_length=500)
     phone = models.CharField(max_length=20, blank=True, null=True)
@@ -21,7 +21,7 @@ class Pharmacy(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'pharmacy'
+        db_table = 'pharmacies'
 
     def __str__(self):
         return self.name
