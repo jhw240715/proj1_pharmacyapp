@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}약국 검색 - 약국 리뷰 사이트{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>약국 검색</h1>
+    <div class="row">
+        <div class="col-md-8">
+            <div id="map" style="width:100%;height:400px;"></div>
+        </div>
+        <div class="col-md-4">
+            <h2>검색된 약국 목록</h2>
+            <ul id="pharmacy-list" class="list-group"></ul>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_maps_api_key }}&libraries=services"></script>
+<script>
+    var mapContainer = document.getElementById('map'),
+        mapOption = {
+            center: new kakao.maps.LatLng(37.566826, 126.9786567),
+            level: 3
+        };
+
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+    var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+    var ps = new kakao.maps.services.Places(map);
+    var pharmacyListElement = document.getElementById('pharmacy-list');
+
+    // 현재 위치 가져오기
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var lat = position.coords.latitude,
+                lon = position.coords.longitude;
+
+            var locPosition = new kakao.maps.LatLng(lat, lon);
+            map.setCenter(locPosition);
+
+            searchPharmacies(locPosition);
+        }, function() {
+            var locPosition = new kakao.maps.LatLng(37.566826, 126.9786567);
+            map.setCenter(locPosition);
+            searchPharmacies(locPosition);
+        });
+    } else {
+        var locPosition = new kakao.maps.LatLng(37.566826, 126.9786567);
+        map.setCenter(locPosition);
+        searchPharmacies(locPosition);
+    }
+
+    function searchPharmacies(location) {
+        ps.keywordSearch('약국', placesSearchCB, {
+            location: location,
+            radius: 5000,
+            sort: kakao.maps.services.SortBy.DISTANCE
+        });
+    }
+
+    function placesSearchCB(data, status, pagination) {
+        if (status === kakao.maps.services.Status.OK) {
+            pharmacyListElement.innerHTML = ''; // 목록 초기화
+            var pharmacies = data.map(place => ({
+                id: place.id,
+                name: place.place_name,
+                address: place.address_name,
+                phone: place.phone,
+                latitude: place.y,
+                longitude: place.x
+            }));
+
+            pharmacies.forEach(function(pharmacy) {
+                displayMarker(pharmacy);
+                addToPharmacyList(pharmacy);
+            });
+
+            savePharmacies(pharmacies);
+        }
+    }
+
+    function displayMarker(place) {
+        var marker = new kakao.maps.Marker({
+            map: map,
+            position: new kakao.maps.LatLng(place.latitude, place.longitude)
+        });
+
+        kakao.maps.event.addListener(marker, 'click', function() {
+            infowindow.setContent('<div style="padding:5px;font-size:12px;">' + place.name + '</div>');
+            infowindow.open(map, marker);
+        });
+    }
+
+    function addToPharmacyList(place) {
+        var li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.innerHTML = '<strong>' + place.name + '</strong><br>' +
+                       '주소: ' + place.address + '<br>' +
+                       '전화: ' + (place.phone || '정보 없음');
+        pharmacyListElement.appendChild(li);
+
+        li.addEventListener('click', function() {
+            map.setCenter(new kakao.maps.LatLng(place.latitude, place.longitude));
+            map.setLevel(3);
+        });
+    }
+
+    function savePharmacies(pharmacies) {
+        fetch('{% url "save_pharmacies" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(pharmacies)
+        })
+        .then(response => response.json())
+        .then(data => console.log('Saved pharmacies:', data))
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock %}
