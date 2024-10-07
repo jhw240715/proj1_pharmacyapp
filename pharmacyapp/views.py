@@ -27,6 +27,7 @@ from .forms import BoardForm, ScoreForm, CustomUserCreationForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.db import connection
 
 # ----------------------
 # 약국 관련
@@ -332,23 +333,29 @@ def home(request):
 @require_POST
 @csrf_exempt
 def save_pharmacies(request):
-    data = json.loads(request.body)
-    saved_count = 0
-    for pharmacy_data in data:
-        pharmacy, created = Pharmacy.objects.get_or_create(
-            p_id=pharmacy_data['id'],  # 카카오에서 제공하는 고유 ID
-            defaults={
-                'name': pharmacy_data['name'],
-                'address': pharmacy_data['address'],
-                'phone': pharmacy_data.get('phone', ''),
-                'latitude': pharmacy_data['latitude'],
-                'longitude': pharmacy_data['longitude']
-            }
-        )
-        if created:
-            saved_count += 1
+    if request.method == 'POST':
+        pharmacies = json.loads(request.body)
+        with connection.cursor() as cursor:
+            # Clear existing data
+            cursor.execute("TRUNCATE TABLE pharmacies")
 
-    return JsonResponse({'status': 'success', 'saved_count': saved_count})
+            # Insert new data
+            for pharmacy in pharmacies:
+                cursor.execute("""
+                    INSERT INTO pharmacies (p_id, name, address, phone, latitude, longitude)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (
+                    pharmacy['id'],
+                    pharmacy['name'],
+                    pharmacy['address'],
+                    pharmacy['phone'],
+                    pharmacy['latitude'],
+                    pharmacy['longitude']
+                ))
+
+        return JsonResponse({'status': 'success', 'message': f'{len(pharmacies)} pharmacies saved'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
 
 
 # 카카오 맵 검색 페이지를 렌더링하는 뷰

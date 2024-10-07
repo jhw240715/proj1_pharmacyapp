@@ -19,8 +19,8 @@
                             <strong>ID:</strong> {{ pharmacy.p_id }}<br>
                             <strong>주소:</strong> {{ pharmacy.address }}<br>
                             <strong>전화:</strong> {{ pharmacy.phone|default:"정보 없음" }}<br>
-                            <strong>위도:</strong> {{ pharmacy.latitude }}<br>
-                            <strong>경도:</strong> {{ pharmacy.longitude }}
+<!--                            <strong>위도:</strong> {{ pharmacy.latitude }}<br>-->
+<!--                            <strong>경도:</strong> {{ pharmacy.longitude }}-->
                         </p>
                         <a href="{% url 'pharmacy_detail' p_id=pharmacy.p_id %}" class="btn btn-primary">상세 정보</a>
                     </div>
