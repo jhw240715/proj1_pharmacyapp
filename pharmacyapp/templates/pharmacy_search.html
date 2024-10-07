@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}약국 검색 - 약국 리뷰 사이트{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>약국 검색</h1>
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <div class="input-group">
+                <input type="text" id="address" class="form-control" placeholder="주소를 입력하세요">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" onclick="searchAddress()">검색</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div id="map" style="width:100%;height:400px;"></div>
+        </div>
+        <div class="col-md-4">
+            <h2>검색된 약국 목록</h2>
+            <div id="pharmacy-list-container" style="height: 400px; overflow-y: auto;">
+                <ul id="pharmacy-list" class="list-group"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_MAPS_API_KEY }}&libraries=services"></script>
+<script>
+    var mapContainer = document.getElementById('map'),
+        mapOption = {
+            center: new kakao.maps.LatLng(37.566826, 126.9786567),
+            level: 3
+        };
+
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+    var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+    var ps = new kakao.maps.services.Places(map);
+    var geocoder = new kakao.maps.services.Geocoder();
+    var pharmacyListElement = document.getElementById('pharmacy-list');
+
+    // 현재 위치 가져오기
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var lat = position.coords.latitude,
+                lon = position.coords.longitude;
+
+            var locPosition = new kakao.maps.LatLng(lat, lon);
+            map.setCenter(locPosition);
+
+            searchPharmacies(locPosition);
+        }, function() {
+            var locPosition = new kakao.maps.LatLng(37.566826, 126.9786567);
+            map.setCenter(locPosition);
+            searchPharmacies(locPosition);
+        });
+    } else {
+        var locPosition = new kakao.maps.LatLng(37.566826, 126.9786567);
+        map.setCenter(locPosition);
+        searchPharmacies(locPosition);
+    }
+
+    function searchAddress() {
+        var keyword = document.getElementById('address').value;
+
+        // 키워드로 장소 검색
+        ps.keywordSearch(keyword, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                // 검색된 장소 중 첫 번째 결과의 좌표 사용
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                map.setCenter(coords);
+
+                // 해당 좌표 주변의 약국 검색
+                searchPharmacies(coords);
+            } else {
+                alert('해당 키워드의 장소를 찾을 수 없습니다. 다시 확인해주세요.');
+            }
+        });
+    }
+
+    function searchPharmacies(location) {
+        ps.keywordSearch('약국', function(data, status, pagination) {
+            if (status === kakao.maps.services.Status.OK) {
+                pharmacyListElement.innerHTML = ''; // 목록 초기화
+                var bounds = new kakao.maps.LatLngBounds();
+
+                for (var i = 0; i < data.length; i++) {
+                    displayMarker(data[i]);
+                    bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
+                }
+
+                map.setBounds(bounds);
+
+                var pharmacies = data.map(place => ({
+                    id: place.id,
+                    name: place.place_name,
+                    address: place.address_name,
+                    phone: place.phone,
+                    latitude: place.y,
+                    longitude: place.x
+                }));
+
+                pharmacies.forEach(addToPharmacyList);
+                savePharmacies(pharmacies);
+            }
+        }, {
+            location: location,
+            radius: 5000,
+            sort: kakao.maps.services.SortBy.DISTANCE
+        });
+    }
+
+    function displayMarker(place) {
+        var marker = new kakao.maps.Marker({
+            map: map,
+            position: new kakao.maps.LatLng(place.y, place.x)
+        });
+
+        kakao.maps.event.addListener(marker, 'click', function() {
+            infowindow.setContent('<div style="padding:5px;font-size:12px;">' + place.place_name + '</div>');
+            infowindow.open(map, marker);
+        });
+    }
+
+    function addToPharmacyList(place) {
+        var li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.innerHTML = '<strong>' + place.name + '</strong><br>' +
+                       '주소: ' + place.address + '<br>' +
+                       '전화: ' + (place.phone || '정보 없음');
+        pharmacyListElement.appendChild(li);
+
+        li.addEventListener('click', function() {
+            map.setCenter(new kakao.maps.LatLng(place.latitude, place.longitude));
+            map.setLevel(3);
+        });
+    }
+
+    function savePharmacies(pharmacies) {
+        fetch('{% url "save_pharmacies" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(pharmacies)
+        })
+        .then(response => response.json())
+        .then(data => console.log('Saved pharmacies:', data))
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock %}

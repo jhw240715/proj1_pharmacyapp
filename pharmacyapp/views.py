@@ -11,6 +11,7 @@ from django.db import transaction
 from django.db.models import Count, Avg
 from django.conf import settings
 from django.http import HttpResponse
+import json
 
 import requests
 from geopy.distance import geodesic
@@ -22,6 +23,12 @@ import matplotlib.font_manager as fm
 
 from .models import Pharmacy, Score, Board
 from .forms import BoardForm, ScoreForm, CustomUserCreationForm
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.db import connection
+
 # ----------------------
 # 약국 관련
 # ----------------------
@@ -44,48 +51,48 @@ def pharmacy_detail(request, p_id):
     })
 
 
-# 유저 0.5km 반경 약국 찾기
-
-GOOGLE_MAPS_API_KEY = settings.GOOGLE_MAPS_API_KEY
-
-@login_required
-def nearby_pharmacies(request):
-    if request.method == 'POST':
-        address = request.POST.get('address')
-        if not address:
-            return render(request, 'nearby_pharmacies.html', {'error': '주소를 입력해주세요.'})
-
-
-        geocode_url = f'https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={GOOGLE_MAPS_API_KEY}'
-
-        try:
-            response = requests.get(geocode_url).json()
-
-            if response['status'] != 'OK':
-                return render(request, 'nearby_pharmacies.html', {'error': '주소를 찾을 수 없습니다.'})
-
-            user_lat = response['results'][0]['geometry']['location']['lat']
-            user_lon = response['results'][0]['geometry']['location']['lng']
-            user_location = (user_lat, user_lon)
-
-            pharmacies = Pharmacy.objects.all()
-            nearby = []
-
-            for pharmacy in pharmacies:
-                if pharmacy.latitude and pharmacy.longitude:
-                    pharmacy_location = (pharmacy.latitude, pharmacy.longitude)
-                    distance = geodesic(user_location, pharmacy_location).km
-                    if distance <= 5:  # Changed to 5km radius
-                        nearby.append({'pharmacy': pharmacy, 'distance': round(distance, 2)})
-
-            nearby.sort(key=lambda x: x['distance'])
-
-            return render(request, 'nearby_pharmacies.html', {'pharmacies': nearby, 'address': address})
-
-        except requests.RequestException:
-            return render(request, 'nearby_pharmacies.html', {'error': '서버 오류가 발생했습니다. 다시 시도해주세요.'})
-
-    return render(request, 'nearby_pharmacies.html')
+# # 유저 0.5km 반경 약국 찾기
+#
+# GOOGLE_MAPS_API_KEY = settings.GOOGLE_MAPS_API_KEY
+#
+# @login_required
+# def nearby_pharmacies(request):
+#     if request.method == 'POST':
+#         address = request.POST.get('address')
+#         if not address:
+#             return render(request, 'nearby_pharmacies.html', {'error': '주소를 입력해주세요.'})
+#
+#
+#         geocode_url = f'https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={GOOGLE_MAPS_API_KEY}'
+#
+#         try:
+#             response = requests.get(geocode_url).json()
+#
+#             if response['status'] != 'OK':
+#                 return render(request, 'nearby_pharmacies.html', {'error': '주소를 찾을 수 없습니다.'})
+#
+#             user_lat = response['results'][0]['geometry']['location']['lat']
+#             user_lon = response['results'][0]['geometry']['location']['lng']
+#             user_location = (user_lat, user_lon)
+#
+#             pharmacies = Pharmacy.objects.all()
+#             nearby = []
+#
+#             for pharmacy in pharmacies:
+#                 if pharmacy.latitude and pharmacy.longitude:
+#                     pharmacy_location = (pharmacy.latitude, pharmacy.longitude)
+#                     distance = geodesic(user_location, pharmacy_location).km
+#                     if distance <= 5:  # Changed to 5km radius
+#                         nearby.append({'pharmacy': pharmacy, 'distance': round(distance, 2)})
+#
+#             nearby.sort(key=lambda x: x['distance'])
+#
+#             return render(request, 'nearby_pharmacies.html', {'pharmacies': nearby, 'address': address})
+#
+#         except requests.RequestException:
+#             return render(request, 'nearby_pharmacies.html', {'error': '서버 오류가 발생했습니다. 다시 시도해주세요.'})
+#
+#     return render(request, 'nearby_pharmacies.html')
 
 
 # ----------------------
@@ -321,3 +328,39 @@ def visualize_scores_page(request):
 # 홈 가기
 def home(request):
     return render(request, 'home.html')
+
+
+@require_POST
+@csrf_exempt
+def save_pharmacies(request):
+    if request.method == 'POST':
+        pharmacies = json.loads(request.body)
+        with connection.cursor() as cursor:
+            # Clear existing data
+            cursor.execute("TRUNCATE TABLE pharmacies")
+
+            # Insert new data
+            for pharmacy in pharmacies:
+                cursor.execute("""
+                    INSERT INTO pharmacies (p_id, name, address, phone, latitude, longitude)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (
+                    pharmacy['id'],
+                    pharmacy['name'],
+                    pharmacy['address'],
+                    pharmacy['phone'],
+                    pharmacy['latitude'],
+                    pharmacy['longitude']
+                ))
+
+        return JsonResponse({'status': 'success', 'message': f'{len(pharmacies)} pharmacies saved'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+
+
+# 카카오 맵 검색 페이지를 렌더링하는 뷰
+def pharmacy_search(request):
+    context = {
+        'KAKAO_MAPS_API_KEY': settings.KAKAO_MAPS_API_KEY
+    }
+    return render(request, 'pharmacy_search.html', context)
